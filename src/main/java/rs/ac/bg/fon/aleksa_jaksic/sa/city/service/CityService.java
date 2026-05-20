@@ -33,7 +33,7 @@ public class CityService {
      * Retrieves a specific city by its unique identifier.
      * @param id unique identifier of the city.
      * @return CityDTO containing the mapped city data.
-     * @throws java.lang.Exception If no city matches the provided identifier.
+     * @throws jakarta.persistence.EntityNotFoundException If no city matches the provided identifier.
      */
     public CityDTO get(Long id) {
         return cityRepository.findById(id)
@@ -66,7 +66,7 @@ public class CityService {
     /**
      * Deletes a city from the database by its unique identifier.
      * @param id unique identifier of the city to delete.
-     * @throws java.lang.Exception If the city with the given identifier does not exist.
+     * @throws jakarta.persistence.EntityNotFoundException If the city with the given identifier does not exist.
      */
     @Transactional
     public void delete(Long id) {
