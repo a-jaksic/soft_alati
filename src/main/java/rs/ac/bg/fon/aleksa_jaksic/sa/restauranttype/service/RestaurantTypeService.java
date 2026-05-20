@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.restauranttype.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import rs.ac.bg.fon.aleksa_jaksic.sa.restauranttype.domain.RestaurantType;
 import rs.ac.bg.fon.aleksa_jaksic.sa.restauranttype.dtos.RestaurantTypeCreateDTO;
 import rs.ac.bg.fon.aleksa_jaksic.sa.restauranttype.dtos.RestaurantTypeDTO;
@@ -22,10 +23,10 @@ public class RestaurantTypeService {
         this.restaurantTypeMapper = restaurantTypeMapper;
     }
 
-    public RestaurantTypeDTO get(Long id) throws Exception{
+    public RestaurantTypeDTO get(Long id) {
         return restaurantTypeRepository.findById(id)
                 .map(restaurantTypeMapper::toDTO)
-                .orElseThrow(() -> new Exception("No restaurant type found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("No restaurant type found with id: " + id));
     }
 
     public List<RestaurantTypeDTO> list() {
@@ -35,18 +36,17 @@ public class RestaurantTypeService {
     }
 
     @Transactional
-    public RestaurantTypeDTO create(RestaurantTypeCreateDTO restaurantTypeCreateDTO) throws Exception{
+    public RestaurantTypeDTO create(RestaurantTypeCreateDTO restaurantTypeCreateDTO) {
         RestaurantType restaurantType = restaurantTypeMapper.toEntity(restaurantTypeCreateDTO);
         return restaurantTypeMapper.toDTO(restaurantTypeRepository.save(restaurantType));
     }
 
     @Transactional
-    public void delete(Long id) throws  Exception {
-        Optional<RestaurantType> restaurantType = restaurantTypeRepository.findById(id);
-        if (restaurantType.isEmpty()){
-            throw new Exception("Could not find restaurant type with given id!");
-        }
-        else restaurantTypeRepository.delete(restaurantType.get());
+    public void delete(Long id) {
+        RestaurantType restaurantType = restaurantTypeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find restaurant type with given id!"));
+
+        restaurantTypeRepository.delete(restaurantType);
     }
 
 }
