@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.city.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import rs.ac.bg.fon.aleksa_jaksic.sa.city.domain.City;
 import rs.ac.bg.fon.aleksa_jaksic.sa.city.dtos.CityCreateDTO;
 import rs.ac.bg.fon.aleksa_jaksic.sa.city.dtos.CityDTO;
@@ -11,6 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service managing cities within the system.
+ * Handles retrieval, creation, and deletion of city entries.
+ * @author Aleksa Jaksic (a-jaksic)
+ */
 @Service
 public class CityService {
 
@@ -23,12 +29,22 @@ public class CityService {
         this.cityMapper = cityMapper;
     }
 
-    public CityDTO get(Long id) throws Exception{
+    /**
+     * Retrieves a specific city by its unique identifier.
+     * @param id unique identifier of the city.
+     * @return CityDTO containing the mapped city data.
+     * @throws jakarta.persistence.EntityNotFoundException If no city matches the provided identifier.
+     */
+    public CityDTO get(Long id) {
         return cityRepository.findById(id)
                 .map(cityMapper::toDTO)
-                .orElseThrow(() -> new Exception("No city found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("No city found with id: " + id));
     }
 
+    /**
+     * Retrieves all cities registered in the system.
+     * @return List of CityDTO objects.
+     */
     public List<CityDTO> list() {
         return cityRepository.findAll()
                 .stream()
@@ -36,18 +52,27 @@ public class CityService {
                 .toList();
     }
 
+    /**
+     * Creates and registers a new city in the database.
+     * @param cityCreateDTO DTO data required to build a city entity.
+     * @return CityDTO of the newly saved city.
+     */
     @Transactional
     public CityDTO create(CityCreateDTO cityCreateDTO) {
         City city = cityMapper.toEntity(cityCreateDTO);
         return cityMapper.toDTO(cityRepository.save(city));
     }
 
+    /**
+     * Deletes a city from the database by its unique identifier.
+     * @param id unique identifier of the city to delete.
+     * @throws jakarta.persistence.EntityNotFoundException If the city with the given identifier does not exist.
+     */
     @Transactional
-    public void delete(Long id) throws Exception{
-        Optional<City> city = cityRepository.findById(id);
-        if (city.isEmpty()){
-            throw new Exception("Could not find city with given id!");
-        }
-        else cityRepository.delete(city.get());
+    public void delete(Long id) {
+        City city = cityRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find city with given id!"));
+
+        cityRepository.delete(city);
     }
 }

@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.photo.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import rs.ac.bg.fon.aleksa_jaksic.sa.files.FileSystemStorageService;
 import rs.ac.bg.fon.aleksa_jaksic.sa.photo.domain.Photo;
 import rs.ac.bg.fon.aleksa_jaksic.sa.photo.dtos.PhotoDTO;
@@ -19,6 +20,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service managing photo uploads, storage tracking of photos and resource retrieval.
+ * Handles assigning photos to either a specific user review or a restaurant's gallery.
+ * @author Aleksa Jaksic (a-jaksic)
+ */
 @Service
 public class PhotoService {
 
@@ -36,9 +42,15 @@ public class PhotoService {
         this.fileSystemStorageService = fileSystemStorageService;
     }
 
-    public List<PhotoDTO> listByReview(Long id) throws Exception {
+    /**
+     * Retrieves all photos associated with a specific review.
+     * @param id identifier of the review.
+     * @return List of PhotoDTO objects.
+     * @throws jakarta.persistence.EntityNotFoundException If no photos are associated with the given review.
+     */
+    public List<PhotoDTO> listByReview(Long id) {
         List<Photo> photos = photoRepository.findByReviewId(id);
-        if (photos != null) {
+        if (!photos.isEmpty()) {
             List<PhotoDTO> photoDTOS = new ArrayList<>();
             photos.forEach(photo -> {
                 PhotoDTO photoDTO = photoMapper.toDTO(photo);
@@ -46,16 +58,24 @@ public class PhotoService {
             });
             return photoDTOS;
         }
-        else throw new Exception("Couldn't retrieve photos for given review!");
+        else throw new EntityNotFoundException("Couldn't retrieve photos for given review!");
     }
 
+    /**
+     * Uploads and associates a list of images with a specific review.
+     * Cleans up storage files if the database persistence fails.
+     * @param id identifier of the review.
+     * @param files List of multipart image files to be processed and saved.
+     * @return List of PhotoDTO records representing the persisted images.
+     * @throws jakarta.persistence.EntityNotFoundException If the target review cannot be found.
+     * @throws java.lang.IllegalArgumentException If the review is malformed or missing its restaurant association.
+     */
     @Transactional
-    public List<PhotoDTO> attachPhotosToReview(Long id, List<MultipartFile> files) throws  Exception{
-        Review review = reviewRepository.findById(id).orElse(null);
-        if (review == null){
-            throw new Exception("The review for given photos does not exist!");
-        } else if (review.getRestaurant() == null) {
-            throw new Exception("The review does not belong to a restaurant!");
+    public List<PhotoDTO> attachPhotosToReview(Long id, List<MultipartFile> files) throws Exception {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("The review for given photos does not exist!"));
+        if (review.getRestaurant() == null) {
+            throw new IllegalArgumentException("The review does not belong to a restaurant!");
         }
         List<String> savedPhotoPaths = fileSystemStorageService.saveReviewPhotos(review, files);
         try {
@@ -74,7 +94,13 @@ public class PhotoService {
         }
     }
 
-    public List<PhotoDTO> listByRestaurant(Long id) throws Exception{
+    /**
+     * Retrieves all photos associated with a specific restaurant.
+     * @param id identifier of the restaurant.
+     * @return List of PhotoDTO objects.
+     * @throws jakarta.persistence.EntityNotFoundException If no photos are found for the given restaurant.
+     */
+    public List<PhotoDTO> listByRestaurant(Long id){
         List<Photo> photos = photoRepository.findByRestaurantId(id);
         if (photos != null) {
             List<PhotoDTO> photoDTOS = new ArrayList<>();
@@ -84,15 +110,21 @@ public class PhotoService {
             });
             return photoDTOS;
         }
-        else throw new Exception("Couldn't retrieve photos for given restaurant!");
+        else throw new EntityNotFoundException("Couldn't retrieve photos for given restaurant!");
     }
 
+    /**
+     * Uploads and associates a list of images with a restaurant's gallery.
+     * Cleans up storage files if the database persistence fails.
+     * @param id identifier of the target restaurant.
+     * @param files List of multipart image files to be processed and saved.
+     * @return List of PhotoDTO records representing the persisted images.
+     * @throws jakarta.persistence.EntityNotFoundException If the target restaurant cannot be found.
+     */
     @Transactional
     public List<PhotoDTO> attachPhotosToRestaurant(Long id, List<MultipartFile> files) throws Exception {
-        Restaurant restaurant = restaurantRepository.findById(id).orElse(null);
-        if (restaurant == null) {
-            throw new Exception("The restaurant for given photos does not exist!");
-        }
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("The restaurant for given photos does not exist!"));
         List<String> savedPhotoPaths = fileSystemStorageService.saveRestaurantPhotos(restaurant, files);
         try {
             List<Photo> photos = savedPhotoPaths.stream().map(path ->
@@ -110,31 +142,39 @@ public class PhotoService {
         }
     }
 
-    public Resource loadAsResource(Long id) throws Exception{
-        Photo photo = photoRepository.findById(id).orElse(null);
-        if (photo == null) {
-            throw new Exception("No photo found with given id!");
-        }
+    /**
+     * Fetches a physical photo file from the storage as a Spring Resource wrapper.
+     * @param id identifier of the target photo record.
+     * @return Resource representing the file download target.
+     * @throws jakarta.persistence.EntityNotFoundException If the record is missing or storage lookup fails.
+     */
+    public Resource loadAsResource(Long id) {
+        Photo photo = photoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No photo found with given id!"));
         String path = photo.getFilePath();
         try {
             return fileSystemStorageService.fetchFile(path);
         } catch (Exception e) {
-            throw new Exception("Could not fetch photo with given id!");
+            throw new EntityNotFoundException("Could not fetch photo with given id!");
         }
 
     }
 
-    public void delete(Long id) throws Exception{
-        Photo photo = photoRepository.findById(id).orElse(null);
-        if (photo == null) {
-            throw new Exception("No photo found with given id!");
-        }
+    /**
+     * Purges a photo record by deleting its storage file and removing database entries.
+     * @param id identifier of the photo to be deleted.
+     * @throws jakarta.persistence.EntityNotFoundException If the target photo record cannot be found.
+     */
+    public void delete(Long id) {
+        Photo photo = photoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No photo found with given id!"));
+
         String path = photo.getFilePath();
         try {
             fileSystemStorageService.deleteFile(path);
             photoRepository.delete(photo);
         } catch (Exception e) {
-            throw new Exception("Could not delete photo with given id!");
+            throw new EntityNotFoundException("Could not delete photo with given id!");
         }
     }
 }
