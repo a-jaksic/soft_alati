@@ -16,8 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
+/**
+ * Service for executing operations on user accounts.
+ * Responsible for processing registrations, password hashing, resolving user configurations,
+ * updating user profiles, and issuing security context header changes.
+ * @author Aleksa Jakšić (aleksa-jaksic)
+ */
 @Service
 public class UserService {
 
@@ -36,6 +41,12 @@ public class UserService {
         this.authService = authService;
     }
 
+    /**
+     * Registers a new user into the database after executing identity validations.
+     * @param userRegisterDTO UserRegisterDTO containing account configuration.
+     * @return UserResponseDTO containing the basic information about the user.
+     * @throws java.lang.IllegalArgumentException If email or username is already taken.
+     */
     @Transactional
     public UserResponseDTO register(UserRegisterDTO userRegisterDTO) {
         if (userRepository.existsByEmail(userRegisterDTO.email())){
@@ -52,12 +63,27 @@ public class UserService {
 
     }
 
+    /**
+     * Obtains target user information associated with a currently authenticated user.
+     * @param username username of the target account.
+     * @return UserResponseDTO containing the essential information about the user.
+     * @throws jakarta.persistence.EntityNotFoundException If user cannot be found.
+     */
     public UserResponseDTO getCurrentUserDetails(String username) {
         return userRepository.findByUsername(username)
                 .map(userMapper::toResponseDTO)
                 .orElseThrow(() -> new EntityNotFoundException("No user found with given username"));
     }
 
+    /**
+     * Updates existing user configuration, resolves information changes and resets tokens.
+     * @param username username of the account being edited.
+     * @param userUpdateDTO UserUpdateDTO containing updated data fields.
+     * @return Map structure mapping updated response DTO data and updated authorization HttpHeaders.
+     * @throws jakarta.persistence.EntityNotFoundException If the user is not found.
+     * @throws java.lang.IllegalArgumentException If the new email of the updated user is already taken
+     * or if the new password of the user is the same as the previous one.
+     */
     public Map<String,Object> updateCurrentUser(String username, UserUpdateDTO userUpdateDTO) {
         User foundUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("No user found with given username"));
