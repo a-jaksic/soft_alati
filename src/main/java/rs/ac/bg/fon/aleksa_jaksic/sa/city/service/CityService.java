@@ -69,7 +69,7 @@ public class CityService {
      * @throws java.lang.Exception If the city with the given identifier does not exist.
      */
     @Transactional
-    public void delete(Long id) throws Exception{
+    public void delete(Long id) {
         City city = cityRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Could not find city with given id!"));
 
