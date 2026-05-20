@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.city.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import rs.ac.bg.fon.aleksa_jaksic.sa.city.domain.City;
 import rs.ac.bg.fon.aleksa_jaksic.sa.city.dtos.CityCreateDTO;
 import rs.ac.bg.fon.aleksa_jaksic.sa.city.dtos.CityDTO;
@@ -34,10 +35,10 @@ public class CityService {
      * @return CityDTO containing the mapped city data.
      * @throws java.lang.Exception If no city matches the provided identifier.
      */
-    public CityDTO get(Long id) throws Exception{
+    public CityDTO get(Long id) {
         return cityRepository.findById(id)
                 .map(cityMapper::toDTO)
-                .orElseThrow(() -> new Exception("No city found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("No city found with id: " + id));
     }
 
     /**
@@ -69,10 +70,9 @@ public class CityService {
      */
     @Transactional
     public void delete(Long id) throws Exception{
-        Optional<City> city = cityRepository.findById(id);
-        if (city.isEmpty()){
-            throw new Exception("Could not find city with given id!");
-        }
-        else cityRepository.delete(city.get());
+        City city = cityRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Could not find city with given id!"));
+
+        cityRepository.delete(city);
     }
 }
