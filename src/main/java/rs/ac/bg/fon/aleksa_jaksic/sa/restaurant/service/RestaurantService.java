@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.restaurant.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import rs.ac.bg.fon.aleksa_jaksic.sa.city.domain.City;
 import rs.ac.bg.fon.aleksa_jaksic.sa.city.repository.CityRepository;
 import rs.ac.bg.fon.aleksa_jaksic.sa.files.FileSystemStorageService;
@@ -33,33 +34,26 @@ public class RestaurantService {
         this.fileSystemStorageService = fileSystemStorageService;
     }
 
-    public RestaurantDetailsDTO getRestaurant(Long id) throws Exception{
-        Restaurant restaurant = restaurantRepository.findById(id).orElse(null);
-        if (restaurant == null){
-            throw new Exception("No restaurant found with give id!");
-        }
+    public RestaurantDetailsDTO getRestaurant(Long id) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No restaurant found with given id!"));
         return restaurantMapper.toDetailsDTO(restaurant);
     }
 
-    public Page<RestaurantDTO> getRestaurants(String name, Long typeId, Long cityId, Pageable pageable) throws Exception {
+    public Page<RestaurantDTO> getRestaurants(String name, Long typeId, Long cityId, Pageable pageable) {
         Page<Restaurant> restaurants = restaurantRepository.findFiltered(name, typeId, cityId, pageable);
-        if (restaurants.isEmpty()){
-            throw new Exception("Could not find restaurant with given parameters!");
-        }
         return restaurants.map(restaurantMapper::toDTO);
 
     }
 
     @Transactional
-    public RestaurantDetailsDTO create(RestaurantCreateUpdateDTO restaurantCreateUpdateDTO) throws Exception{
-        RestaurantType restaurantType = restaurantTypeRepository.findById(restaurantCreateUpdateDTO.restaurantTypeId()).orElse(null);
-        City city = cityRepository.findById(restaurantCreateUpdateDTO.cityId()).orElse(null);
-        if (restaurantType == null){
-            throw new Exception("Could not find restaurant type with given id!");
-        }
-        if (city == null){
-            throw new Exception("Could not find city with given id!");
-        }
+    public RestaurantDetailsDTO create(RestaurantCreateUpdateDTO restaurantCreateUpdateDTO) {
+        RestaurantType restaurantType = restaurantTypeRepository.findById(restaurantCreateUpdateDTO.restaurantTypeId())
+                .orElseThrow(() -> new EntityNotFoundException("Could not find restaurant type with given id!"));
+
+        City city = cityRepository.findById(restaurantCreateUpdateDTO.cityId())
+                .orElseThrow(() -> new EntityNotFoundException("Could not find city with given id!"));
+
         Restaurant restaurant = restaurantMapper.toEntity(restaurantCreateUpdateDTO);
         restaurant.setRestaurantType(restaurantType);
         restaurant.setCity(city);
@@ -70,34 +64,32 @@ public class RestaurantService {
     }
 
     @Transactional
-    public RestaurantDetailsDTO update(Long id, RestaurantCreateUpdateDTO restaurantCreateUpdateDTO) throws Exception{
-        Restaurant restaurant = restaurantRepository.findById(id).orElse(null);
-        if (restaurant == null){
-            throw new Exception("No restaurant found with given id!");
-        }
+    public RestaurantDetailsDTO update(Long id, RestaurantCreateUpdateDTO restaurantCreateUpdateDTO) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No restaurant found with given id!"));
+
         restaurantMapper.updateEntityFromUpdateDto(restaurantCreateUpdateDTO, restaurant);
+
         RestaurantType restaurantType = restaurantTypeRepository.findById(restaurantCreateUpdateDTO.restaurantTypeId())
-                .orElseThrow(() -> new Exception("Type not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Type not found"));
+
         City city = cityRepository.findById(restaurantCreateUpdateDTO.cityId())
-                .orElseThrow(() -> new Exception("City not found"));
+                .orElseThrow(() -> new EntityNotFoundException("City not found"));
+
         restaurant.setRestaurantType(restaurantType);
         restaurant.setCity(city);
         return restaurantMapper.toDetailsDTO(restaurantRepository.save(restaurant));
     }
 
     @Transactional
-    public void delete(Long id) throws Exception{
-        Restaurant restaurant = restaurantRepository.findById(id).orElse(null);
-        if (restaurant == null) {
-            throw new Exception("No review found with given id!");
-        }
+    public void delete(Long id) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No restaurant found with given id!"));
         try {
-
             fileSystemStorageService.deleteRestaurantFolder(id);
             restaurantRepository.delete(restaurant);
         } catch (Exception e) {
-            throw new Exception("Could not delete review with given id!");
+            throw new EntityNotFoundException("Could not delete restaurant with given id!");
         }
-
     }
 }
