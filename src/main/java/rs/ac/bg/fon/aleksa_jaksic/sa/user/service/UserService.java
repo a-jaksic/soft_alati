@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.user.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import rs.ac.bg.fon.aleksa_jaksic.sa.security.service.AuthService;
 import rs.ac.bg.fon.aleksa_jaksic.sa.user.domain.Role;
 import rs.ac.bg.fon.aleksa_jaksic.sa.user.domain.User;
@@ -36,13 +37,13 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDTO register(UserRegisterDTO userRegisterDTO) throws Exception{
+    public UserResponseDTO register(UserRegisterDTO userRegisterDTO) {
         if (userRepository.existsByEmail(userRegisterDTO.email())){
-            throw new Exception("This email is already taken!");
+            throw new IllegalArgumentException("This email is already taken!");
         }
 
         if (userRepository.existsByUsername(userRegisterDTO.username())){
-            throw new Exception("This username is already taken!");
+            throw new IllegalArgumentException("This username is already taken!");
         }
         User user = userMapper.toEntity(userRegisterDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -51,27 +52,23 @@ public class UserService {
 
     }
 
-    public UserResponseDTO getCurrentUserDetails(String username) throws Exception {
-        Optional<User> foundUser = userRepository.findByUsername(username);
-        if (foundUser.isEmpty()){
-            throw new Exception("No user found with given username");
-        }
-        
-        return userMapper.toResponseDTO(foundUser.get());
-        
+    public UserResponseDTO getCurrentUserDetails(String username) {
+        return userRepository.findByUsername(username)
+                .map(userMapper::toResponseDTO)
+                .orElseThrow(() -> new EntityNotFoundException("No user found with given username"));
     }
 
-    public Map<String,Object> updateCurrentUser(String username, UserUpdateDTO userUpdateDTO) throws Exception {
-        User foundUser = userRepository.findByUsername(username).
-                orElseThrow(() -> new Exception("No user found with given username"));
+    public Map<String,Object> updateCurrentUser(String username, UserUpdateDTO userUpdateDTO) {
+        User foundUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("No user found with given username"));
 
         if (!foundUser.getEmail().equals(userUpdateDTO.email()) && userRepository.existsByEmail(userUpdateDTO.email())) {
-            throw new Exception("This email is already taken!");
+            throw new IllegalArgumentException("This email is already taken!");
         }
 
         if (userUpdateDTO.newPassword() != null && !userUpdateDTO.newPassword().isBlank()) {
             if (!passwordEncoder.matches(userUpdateDTO.currentPassword(), foundUser.getPassword())) {
-                throw new Exception("Current password verification failed!");
+                throw new IllegalArgumentException("Current password verification failed!");
             }
             foundUser.setPassword(passwordEncoder.encode(userUpdateDTO.newPassword()));
         }
