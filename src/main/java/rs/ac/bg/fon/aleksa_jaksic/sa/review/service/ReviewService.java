@@ -25,7 +25,7 @@ import java.util.List;
  * Handles the creation, retrieval, modification, and deletion of reviews while
  * triggering the recalculation of restaurant ratings and the management
  * of file assets.
- * @author Aleksa Jakšić (aleksa-jaksic)
+ * @author Aleksa Jakšić (a-jaksic)
  */
 @Service
 public class ReviewService {

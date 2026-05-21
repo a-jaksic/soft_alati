@@ -17,7 +17,7 @@ import java.util.List;
  * Service for managing working days for restaurants.
  * Handles the configuration of opening and closing intervals, verification of operating
  * hour constraints, and persistence of workday information.
- * @author Aleksa Jakšić (aleksa-jaksic)
+ * @author Aleksa Jakšić (a-jaksic)
  */
 @Service
 public class WorkDayService {

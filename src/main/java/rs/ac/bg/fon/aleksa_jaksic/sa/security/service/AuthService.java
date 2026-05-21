@@ -19,7 +19,7 @@ import java.util.List;
  * Service for orchestrating security authentication and token management.
  * Validates credentials with standard security configurations, handles stateless session cookies,
  * processes and evaluates tokens and configures clearance cookies for sign-outs.
- * @author Aleksa Jakšić (aleksa-jaksic)
+ * @author Aleksa Jakšić (a-jaksic)
  */
 @Service
 public class AuthService {

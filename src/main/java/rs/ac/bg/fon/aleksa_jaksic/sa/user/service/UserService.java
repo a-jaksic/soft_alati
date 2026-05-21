@@ -21,7 +21,7 @@ import java.util.Map;
  * Service for executing operations on user accounts.
  * Responsible for processing registrations, password hashing, resolving user configurations,
  * updating user profiles, and issuing security context header changes.
- * @author Aleksa Jakšić (aleksa-jaksic)
+ * @author Aleksa Jakšić (a-jaksic)
  */
 @Service
 public class UserService {
