@@ -1,6 +1,8 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.city.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 /**
@@ -29,10 +31,14 @@ public class City {
     /**
      * The name of the city.
      */
+    @NotBlank(message = "City name must not be blank")
+    @Size(max = 100, message = "City name is too long")
     private String name;
 
     /**
      * The postal/zip code associated with the city.
      */
+    @NotBlank(message = "Postal code must not be blank")
+    @Size(max = 20, message = "Postal code is too long")
     private String postalCode;
 }

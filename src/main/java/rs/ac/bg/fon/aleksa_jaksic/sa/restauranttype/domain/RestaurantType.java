@@ -1,6 +1,8 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.restauranttype.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 /**
  * Represents the cuisine style of a restaurant.
@@ -27,5 +29,7 @@ public class RestaurantType {
     /**
      * The name of the restaurant type category (e.g., "Italian", "Mexican").
      */
+    @NotBlank(message = "Restaurant type name must not be blank")
+    @Size(max = 50, message = "Restaurant type name is too long")
     private String name;
 }

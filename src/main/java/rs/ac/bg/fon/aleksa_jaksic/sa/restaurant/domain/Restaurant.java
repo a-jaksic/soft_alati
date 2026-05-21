@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.restaurant.domain;
 
+import jakarta.validation.constraints.*;
 import rs.ac.bg.fon.aleksa_jaksic.sa.city.domain.City;
 import rs.ac.bg.fon.aleksa_jaksic.sa.restauranttype.domain.RestaurantType;
 import jakarta.persistence.*;
@@ -31,26 +32,36 @@ public class Restaurant {
     /**
      * The name of the restaurant.
      */
+    @NotBlank(message = "Restaurant name must not be blank")
+    @Size(max = 100, message = "Restaurant name is too long")
     private String name;
 
     /**
      * The physical address of the restaurant.
      */
+    @NotBlank(message = "Address must not be blank")
     private String address;
 
     /**
      * Geographical latitude for mapping and proximity calculations.
      */
+    @NotNull(message = "Latitude is required")
+    @Min(value = -90, message = "Latitude must be between -90 and 90")
+    @Max(value = 90, message = "Latitude must be between -90 and 90")
     private Double latitude;
 
     /**
      * Geographical longitude for mapping and proximity calculations.
      */
+    @NotNull(message = "Longitude is required")
+    @Min(value = -180, message = "Longitude must be between -180 and 180")
+    @Max(value = 180, message = "Longitude must be between -180 and 180")
     private Double longitude;
 
     /**
      * The contact phone number of the restaurant.
      */
+    @Pattern(regexp = "^\\+?[0-9\\s\\-\\/]{6,20}$", message = "Invalid phone number format")
     private String phoneNum;
 
     /**
@@ -61,11 +72,14 @@ public class Restaurant {
     /**
      * Total number of reviews submitted for this restaurant.
      */
+    @Min(value = 0, message = "Review count cannot be negative")
     private Integer reviewCount;
 
     /**
      * The average rating score calculated across all user reviews.
      */
+    @Min(value = 0, message = "Average rating cannot be negative")
+    @Max(value = 5, message = "Average rating cannot exceed 5")
     private Double avgRating;
 
 

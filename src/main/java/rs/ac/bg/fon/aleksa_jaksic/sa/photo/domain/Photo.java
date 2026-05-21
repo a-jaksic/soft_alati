@@ -1,5 +1,7 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.photo.domain;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import rs.ac.bg.fon.aleksa_jaksic.sa.restaurant.domain.Restaurant;
 import rs.ac.bg.fon.aleksa_jaksic.sa.review.domain.Review;
 import jakarta.persistence.*;
@@ -35,11 +37,13 @@ public class Photo {
     /**
      * The file path where the photo is stored locally or on the server.
      */
+    @NotBlank(message = "File path must not be blank")
     private String filePath;
 
     /**
      * The timestamp indicating when the photo record was created.
      */
+    @NotNull(message = "Creation timestamp is required")
     private LocalDateTime createdAt;
 
     /**
@@ -65,7 +69,7 @@ public class Photo {
      */
     @PrePersist
     @PreUpdate
-    private void validateConstraints() {
+    public void validateConstraints() {
         boolean hasReview = (review != null);
         boolean hasRestaurant = (restaurant != null);
 

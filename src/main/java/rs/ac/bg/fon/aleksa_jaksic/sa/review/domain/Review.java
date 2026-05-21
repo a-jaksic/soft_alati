@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.review.domain;
 
+import jakarta.validation.constraints.*;
 import rs.ac.bg.fon.aleksa_jaksic.sa.restaurant.domain.Restaurant;
 import rs.ac.bg.fon.aleksa_jaksic.sa.user.domain.User;
 import jakarta.persistence.*;
@@ -32,21 +33,29 @@ public class Review {
     /**
      * The numeric score of the review.
      */
+    @NotNull(message = "Rating must not be null")
+    @Min(value = 1, message = "Rating score must be at least 1")
+    @Max(value = 5, message = "Rating score cannot exceed 5")
     private Integer rating;
 
     /**
      * The title of the review.
      */
+    @NotBlank(message = "Review title must not be blank")
+    @Size(max = 100, message = "Review title is too long")
     private String title;
 
     /**
      * The textual content describing the user's dining experience.
      */
+    @NotBlank(message = "Review description must not be blank")
+    @Size(max = 2000, message = "Review description is too long")
     private String description;
 
     /**
      * The timestamp indicating when the review was created.
      */
+    @NotNull(message = "Creation timestamp is required")
     private LocalDateTime createdAt;
 
     /**
