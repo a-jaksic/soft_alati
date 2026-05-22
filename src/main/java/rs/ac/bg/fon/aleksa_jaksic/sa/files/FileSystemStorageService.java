@@ -82,6 +82,8 @@ public class FileSystemStorageService {
             }
             return successfullySavedPaths;
 
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             for (String path : successfullySavedPaths) {
                 deleteFile(path);
@@ -118,7 +120,8 @@ public class FileSystemStorageService {
                 successfullySavedPaths.add(fullRelativePath);
             }
             return successfullySavedPaths;
-
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
             for (String path : successfullySavedPaths) {
                 deleteFile(path);
