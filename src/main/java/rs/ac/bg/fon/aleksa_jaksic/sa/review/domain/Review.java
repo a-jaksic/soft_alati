@@ -32,6 +32,7 @@ public class Review {
 
     /**
      * The numeric score of the review.
+     * Must not be null and must fall within a strict range between 1 and 5 stars.
      */
     @NotNull(message = "Rating must not be null")
     @Min(value = 1, message = "Rating score must be at least 1")
@@ -40,6 +41,7 @@ public class Review {
 
     /**
      * The title of the review.
+     * Must not be blank and is restricted to a maximum of 100 characters.
      */
     @NotBlank(message = "Review title must not be blank")
     @Size(max = 100, message = "Review title is too long")
@@ -47,6 +49,7 @@ public class Review {
 
     /**
      * The textual content describing the user's dining experience.
+     * Must not be blank and allows for feedback up to a maximum limit of 2000 characters.
      */
     @NotBlank(message = "Review description must not be blank")
     @Size(max = 2000, message = "Review description is too long")
@@ -54,6 +57,7 @@ public class Review {
 
     /**
      * The timestamp indicating when the review was created.
+     * Must not be null.
      */
     @NotNull(message = "Creation timestamp is required")
     private LocalDateTime createdAt;
