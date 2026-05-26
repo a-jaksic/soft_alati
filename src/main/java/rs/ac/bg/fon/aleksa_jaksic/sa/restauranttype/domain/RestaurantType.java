@@ -28,6 +28,8 @@ public class RestaurantType {
     private Long id;
     /**
      * The name of the restaurant type category (e.g., "Italian", "Mexican").
+     * Must not be blank and is restricted to a maximum of 50 characters.
+     * Enforces a unique constraint to prevent duplicate restaurant type names in the system.
      */
     @NotBlank(message = "Restaurant type name must not be blank")
     @Size(max = 50, message = "Restaurant type name is too long")

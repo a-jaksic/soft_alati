@@ -36,18 +36,22 @@ public class Photo {
 
     /**
      * The file path where the photo is stored locally or on the server.
+     * Enforces a unique constraint to prevent duplicate filepath allocation.
+     * Must not be blank.
      */
     @NotBlank(message = "File path must not be blank")
     private String filePath;
 
     /**
      * The timestamp indicating when the photo record was created.
+     * Must not be null.
      */
     @NotNull(message = "Creation timestamp is required")
     private LocalDateTime createdAt;
 
     /**
      * The review associated with this photo, if applicable.
+     * Cannot be populated if a link with a restaurant exists.
      */
     @ManyToOne
     @JoinColumn(name = "review_id")
@@ -56,6 +60,7 @@ public class Photo {
 
     /**
      * The restaurant gallery associated with this photo, if applicable.
+     * Cannot be populated if a link with a review exists.
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")

@@ -30,6 +30,8 @@ public class City {
 
     /**
      * The name of the city.
+     * Must not be blank and is restricted to a maximum of 100 characters.
+     * Part of a unique constraint, the combination of this name and the associated postal code must be unique across the system.
      */
     @NotBlank(message = "City name must not be blank")
     @Size(max = 100, message = "City name is too long")
@@ -37,6 +39,8 @@ public class City {
 
     /**
      * The postal/zip code associated with the city.
+     * Must not be blank and is restricted to a maximum of 20 characters.
+     * Part of a unique constraint, the combination of this postal code and the associated city name must be unique across the system.
      */
     @NotBlank(message = "Postal code must not be blank")
     @Size(max = 20, message = "Postal code is too long")
