@@ -31,6 +31,7 @@ public class Restaurant {
 
     /**
      * The name of the restaurant.
+     * Must not be blank and is restricted to a maximum of 100 characters.
      */
     @NotBlank(message = "Restaurant name must not be blank")
     @Size(max = 100, message = "Restaurant name is too long")
@@ -38,12 +39,14 @@ public class Restaurant {
 
     /**
      * The physical address of the restaurant.
+     * Must not be blank to maintain valid navigation records.
      */
     @NotBlank(message = "Address must not be blank")
     private String address;
 
     /**
      * Geographical latitude for mapping and proximity calculations.
+     * Must not be null and must fall within valid coordinate bounds between -90 and 90 degrees.
      */
     @NotNull(message = "Latitude is required")
     @Min(value = -90, message = "Latitude must be between -90 and 90")
@@ -52,6 +55,7 @@ public class Restaurant {
 
     /**
      * Geographical longitude for mapping and proximity calculations.
+     * Must not be null and must fall within valid coordinate bounds between -180 and 180 degrees.
      */
     @NotNull(message = "Longitude is required")
     @Min(value = -180, message = "Longitude must be between -180 and 180")
@@ -60,6 +64,8 @@ public class Restaurant {
 
     /**
      * The contact phone number of the restaurant.
+     * Must match an international or local telephone pattern with an optional leading '+'
+     * and a total length ranging between 6 and 20 digits.
      */
     @Pattern(regexp = "^\\+?[0-9\\s\\-\\/]{6,20}$", message = "Invalid phone number format")
     private String phoneNum;
@@ -71,12 +77,14 @@ public class Restaurant {
 
     /**
      * Total number of reviews submitted for this restaurant.
+     * Dynamically managed running total, must not be below zero.
      */
     @Min(value = 0, message = "Review count cannot be negative")
     private Integer reviewCount;
 
     /**
      * The average rating score calculated across all user reviews.
+     * Must sit within a strict decimal range between 0.0 and 5.0.
      */
     @Min(value = 0, message = "Average rating cannot be negative")
     @Max(value = 5, message = "Average rating cannot exceed 5")
