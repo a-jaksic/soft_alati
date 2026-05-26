@@ -33,18 +33,21 @@ public class WorkDay {
 
     /**
      * The time of day when the restaurant opens.
+     * Must not be null.
      */
     @NotNull(message = "Opening time is required")
     private LocalTime openTime;
 
     /**
      * The time of day when the restaurant closes.
+     * Must not be null.
      */
     @NotNull(message = "Closing time is required")
     private LocalTime closeTime;
 
     /**
      * The specific day of the week the restaurant works.
+     * Must not be null.
      */
     @NotNull(message = "Day of the week is required")
     @Enumerated(EnumType.STRING)
@@ -52,6 +55,7 @@ public class WorkDay {
 
     /**
      * The restaurant that this specific workday relates to.
+     * Managed under a strict relational constraint, must not be null.
      */
     @NotNull(message = "Associated restaurant is required")
     @ManyToOne
