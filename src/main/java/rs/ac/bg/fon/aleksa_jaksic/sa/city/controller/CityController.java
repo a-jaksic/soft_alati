@@ -19,7 +19,7 @@ public class CityController {
     }
 
     @GetMapping("/api/cities/{id}")
-    public ResponseEntity<?> get(@PathVariable Long id) {
+    public ResponseEntity<Object> get(@PathVariable Long id) {
         try {
             CityDTO city = cityService.get(id);
             return ResponseEntity
@@ -33,7 +33,7 @@ public class CityController {
     }
 
     @GetMapping("/api/cities")
-    public ResponseEntity<?> list() {
+    public ResponseEntity<Object> list() {
         try {
             List<CityDTO> cityList = cityService.list();
             return ResponseEntity
@@ -47,7 +47,7 @@ public class CityController {
     }
 
     @PostMapping("/api/admin/cities/create")
-    public ResponseEntity<?> create(@RequestBody CityCreateDTO cityCreateDTO){
+    public ResponseEntity<Object> create(@RequestBody CityCreateDTO cityCreateDTO){
         try {
             CityDTO city = cityService.create(cityCreateDTO);
             return ResponseEntity
@@ -61,7 +61,7 @@ public class CityController {
     }
 
     @DeleteMapping("/api/admin/cities/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id){
+    public ResponseEntity<Object> delete(@PathVariable Long id){
         try {
             cityService.delete(id);
             return ResponseEntity

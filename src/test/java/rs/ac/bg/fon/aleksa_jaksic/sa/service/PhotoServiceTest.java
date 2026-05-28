@@ -237,7 +237,7 @@ class PhotoServiceTest {
 
     @Test
     @DisplayName("Should completely drop physical file and database entry when executing delete")
-    void delete_ValidId_DeletesFromStorageAndDatabase() throws Exception {
+    void delete_ValidId_DeletesFromStorageAndDatabase() {
         Long photoId = 1L;
         when(photoRepository.findById(photoId)).thenReturn(Optional.of(samplePhoto));
 

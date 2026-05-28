@@ -19,7 +19,7 @@ public class RestaurantTypeController {
     }
 
     @GetMapping("/api/restaurant_types/{id}")
-    public ResponseEntity<?> get(@PathVariable Long id) {
+    public ResponseEntity<Object> get(@PathVariable Long id) {
         try {
             RestaurantTypeDTO restaurantType = restaurantTypeService.get(id);
             return ResponseEntity
@@ -33,7 +33,7 @@ public class RestaurantTypeController {
     }
 
     @GetMapping("/api/restaurant_types")
-    public ResponseEntity<?> list() {
+    public ResponseEntity<Object> list() {
         try {
             List<RestaurantTypeDTO> restaurantTypeList = restaurantTypeService.list();
             return ResponseEntity
@@ -47,7 +47,7 @@ public class RestaurantTypeController {
     }
 
     @PostMapping("/api/admin/restaurant_types/create")
-    public ResponseEntity<?> create(@RequestBody RestaurantTypeCreateDTO restaurantTypeCreateDTO){
+    public ResponseEntity<Object> create(@RequestBody RestaurantTypeCreateDTO restaurantTypeCreateDTO){
         try {
             RestaurantTypeDTO restaurantType = restaurantTypeService.create(restaurantTypeCreateDTO);
             return ResponseEntity
@@ -61,7 +61,7 @@ public class RestaurantTypeController {
     }
 
     @DeleteMapping("/api/admin/restaurant_types/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id){
+    public ResponseEntity<Object> delete(@PathVariable Long id){
         try {
             restaurantTypeService.delete(id);
             return ResponseEntity

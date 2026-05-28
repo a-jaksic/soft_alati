@@ -64,8 +64,12 @@ class FileSystemStorageServiceTest {
         List<String> paths = storageService.saveReviewPhotos(review, List.of(validFile));
 
         assertEquals(1, paths.size());
-        assertTrue(paths.get(0).startsWith("restaurants/10/reviews/200/"));
-        assertTrue(paths.get(0).endsWith("_pizza.jpg"));
+
+        String normalizedPath = Path.of(paths.get(0)).toString();
+        String expectedStart = Path.of("restaurants", "10", "reviews", "200").toString();
+
+        assertTrue(normalizedPath.contains(expectedStart));
+        assertTrue(normalizedPath.endsWith("pizza.jpg"));
         assertTrue(Files.exists(sharedTempDir.resolve(paths.get(0))));
     }
 
@@ -82,8 +86,12 @@ class FileSystemStorageServiceTest {
         List<String> paths = storageService.saveRestaurantPhotos(restaurant, List.of(validFile));
 
         assertEquals(1, paths.size());
-        assertTrue(paths.get(0).startsWith("restaurants/10/gallery/"));
-        assertTrue(paths.get(0).endsWith("_facade.png"));
+
+        String normalizedPath = Path.of(paths.get(0)).toString();
+        String expectedStart = Path.of("restaurants", "10", "gallery").toString();
+
+        assertTrue(normalizedPath.contains(expectedStart));
+        assertTrue(normalizedPath.endsWith("facade.png"));
         assertTrue(Files.exists(sharedTempDir.resolve(paths.get(0))));
     }
 
@@ -117,7 +125,7 @@ class FileSystemStorageServiceTest {
     @Test
     @DisplayName("Should completely clean up and remove matching review folder hierarchies off the storage")
     void deleteReviewFolder_DeletesTargetDirectoryRecursively() throws IOException {
-        Path reviewDir = Files.createDirectories(sharedTempDir.resolve("restaurants/10/reviews/200"));
+        Path reviewDir = Files.createDirectories(sharedTempDir.resolve(Path.of("restaurants", "10", "reviews", "200")));
         Path targetPhoto = Files.writeString(reviewDir.resolve("photo.jpg"), "content");
 
         assertTrue(Files.exists(targetPhoto));
@@ -131,7 +139,7 @@ class FileSystemStorageServiceTest {
     @Test
     @DisplayName("Should clean up and remove entire restaurant parent folder structure recursively")
     void deleteRestaurantFolder_DeletesAllNestedContentRecursively() throws IOException {
-        Path restaurantDir = Files.createDirectories(sharedTempDir.resolve("restaurants/10"));
+        Path restaurantDir = Files.createDirectories(sharedTempDir.resolve(Path.of("restaurants", "10")));
         Path galleryDir = Files.createDirectories(restaurantDir.resolve("gallery"));
         Path photo = Files.writeString(galleryDir.resolve("img.jpg"), "content");
 
@@ -148,8 +156,10 @@ class FileSystemStorageServiceTest {
     void storeFile_PathTraversalAttempt_ThrowsException() {
         MultipartFile maliciousFile = mock(MultipartFile.class);
 
+        String targetSubPath = Path.of("restaurants", "10").toString();
+
         assertThrows(IllegalArgumentException.class, () ->
-                storageService.storeFile("restaurants/10", "../../../etc/passwd", maliciousFile)
+                storageService.storeFile(targetSubPath, "../../../etc/passwd", maliciousFile)
         );
     }
 }

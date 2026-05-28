@@ -19,7 +19,7 @@ public class WorkDayController {
     }
 
     @GetMapping("/api/restaurants/{id}/workdays")
-    public ResponseEntity<?> list(@PathVariable Long id){
+    public ResponseEntity<Object> list(@PathVariable Long id){
         try {
             List<WorkDayDTO> workDayList = workDayService.list(id);
             return ResponseEntity
@@ -33,7 +33,7 @@ public class WorkDayController {
     }
 
     @PostMapping("/api/admin/restaurants/{id}/workdays/create")
-    public ResponseEntity<?> create(@PathVariable Long id,@RequestBody WorkDayCreateUpdateDTO workDayCreateUpdateDTO){
+    public ResponseEntity<Object> create(@PathVariable Long id,@RequestBody WorkDayCreateUpdateDTO workDayCreateUpdateDTO){
         try {
             WorkDayDTO workDay = workDayService.create(id, workDayCreateUpdateDTO);
             return ResponseEntity
@@ -47,7 +47,7 @@ public class WorkDayController {
     }
 
     @PatchMapping("/api/admin/restaurants/workdays/{id}")
-    public ResponseEntity<?> change(@PathVariable Long id, @RequestBody WorkDayCreateUpdateDTO workDayCreateUpdateDTO){
+    public ResponseEntity<Object> change(@PathVariable Long id, @RequestBody WorkDayCreateUpdateDTO workDayCreateUpdateDTO){
         try {
             WorkDayDTO workDayDTO = workDayService.update(id, workDayCreateUpdateDTO);
             return ResponseEntity
@@ -61,7 +61,7 @@ public class WorkDayController {
     }
 
     @DeleteMapping("/api/admin/restaurants/workdays/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id){
+    public ResponseEntity<Object> delete(@PathVariable Long id){
         try {
             workDayService.delete(id);
             return ResponseEntity

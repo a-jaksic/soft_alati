@@ -24,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserRegisterDTO userRegisterDTO){
+    public ResponseEntity<Object> register(@RequestBody UserRegisterDTO userRegisterDTO){
         try {
             UserResponseDTO user = userService.register(userRegisterDTO);
             return ResponseEntity
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUserDetails(Authentication authentication){
+    public ResponseEntity<Object> getCurrentUserDetails(Authentication authentication){
         try {
             UserResponseDTO currentUser = userService.getCurrentUserDetails(authentication.getName());
             return ResponseEntity
@@ -53,7 +53,7 @@ public class UserController {
     }
 
     @PatchMapping("/me/update")
-    public ResponseEntity<?> updateCurrentUser(Authentication authentication, @RequestBody UserUpdateDTO userUpdateDTO){
+    public ResponseEntity<Object> updateCurrentUser(Authentication authentication, @RequestBody UserUpdateDTO userUpdateDTO){
         try {
             Map<String,Object> map = userService.updateCurrentUser(authentication.getName(), userUpdateDTO);
             UserResponseDTO updatedUser = (UserResponseDTO) map.get("dto");

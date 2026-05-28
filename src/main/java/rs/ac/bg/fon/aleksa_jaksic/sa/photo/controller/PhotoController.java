@@ -24,7 +24,7 @@ public class PhotoController {
     }
 
     @GetMapping("/api/reviews/{id}/photos")
-    public ResponseEntity<?> listReviewPhotos(@PathVariable Long id){
+    public ResponseEntity<Object> listReviewPhotos(@PathVariable Long id){
         try{
             List<PhotoDTO> photoList = photoService.listByReview(id);
             return ResponseEntity
@@ -42,7 +42,7 @@ public class PhotoController {
             value = "/api/reviews/{id}/photos",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<?> uploadReviewPhotos(@PathVariable Long id,@RequestParam("files") List<MultipartFile> files){
+    public ResponseEntity<Object> uploadReviewPhotos(@PathVariable Long id,@RequestParam("files") List<MultipartFile> files){
         try{
             List<PhotoDTO> addedPhotos = photoService.attachPhotosToReview(id, files);
             return ResponseEntity
@@ -57,7 +57,7 @@ public class PhotoController {
 
 
     @GetMapping("/api/restaurants/{id}/photos")
-    public ResponseEntity<?> listRestaurantPhotos(@PathVariable Long id) {
+    public ResponseEntity<Object> listRestaurantPhotos(@PathVariable Long id) {
         try{
             List<PhotoDTO> photoList = photoService.listByRestaurant(id);
             return ResponseEntity
@@ -73,7 +73,7 @@ public class PhotoController {
     @PostMapping(value = "/api/admin/restaurants/{id}/photos",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<?> uploadRestaurantPhotos(@PathVariable Long id, @RequestParam("files") List<MultipartFile> files) {
+    public ResponseEntity<Object> uploadRestaurantPhotos(@PathVariable Long id, @RequestParam("files") List<MultipartFile> files) {
         try {
             List<PhotoDTO> addedPhotos = photoService.attachPhotosToRestaurant(id, files);
             return ResponseEntity
@@ -89,7 +89,7 @@ public class PhotoController {
     /* ===== Služenje fajla i brisanje ===== */
 
     @GetMapping("/api/photos/{id}")
-    public ResponseEntity<?> getPhoto(@PathVariable Long id) {
+    public ResponseEntity<Object> getPhoto(@PathVariable Long id) {
         try {
             Resource res = photoService.loadAsResource(id);
             return ResponseEntity.ok()
@@ -105,7 +105,7 @@ public class PhotoController {
 
     @PreAuthorize("hasAnyRole('ADMIN') or @photoSecurity.isPhotoOwner(#id, authentication)")
     @DeleteMapping("/api/photos/{id}")
-    public ResponseEntity<?> deletePhoto(@PathVariable Long id) {
+    public ResponseEntity<Object> deletePhoto(@PathVariable Long id) {
         try {
             photoService.delete(id);
             return ResponseEntity

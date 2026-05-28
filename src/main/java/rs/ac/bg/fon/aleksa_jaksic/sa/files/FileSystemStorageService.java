@@ -1,5 +1,6 @@
 package rs.ac.bg.fon.aleksa_jaksic.sa.files;
 
+import lombok.extern.slf4j.Slf4j;
 import rs.ac.bg.fon.aleksa_jaksic.sa.restaurant.domain.Restaurant;
 import rs.ac.bg.fon.aleksa_jaksic.sa.review.domain.Review;
 import jakarta.annotation.PostConstruct;
@@ -27,11 +28,13 @@ import java.util.stream.Stream;
  * resolving paths for assets, and executing recursive directory deletions.
  * @author Aleksa Jakšić (a-jaksic)
  */
+@Slf4j
 @Service
 public class FileSystemStorageService {
 
     private final Path rootLocation;
     private final StorageConfiguration storageConfiguration;
+    private static final String RESTAURANTS_BASE_DIR = "restaurants";
 
     public FileSystemStorageService(StorageConfiguration storageConfiguration){
         this.storageConfiguration = storageConfiguration;
@@ -47,7 +50,7 @@ public class FileSystemStorageService {
         try{
             Files.createDirectories(rootLocation);
         } catch (IOException e) {
-            throw new RuntimeException("Could not initialize storage location", e);
+            throw new IllegalStateException("Could not initialize directory structure at " + rootLocation, e);
         }
     }
 
@@ -73,8 +76,9 @@ public class FileSystemStorageService {
                     throw new IllegalArgumentException("One or more files are not valid, check the format and size!");
                 }
                 String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-                String subPath = "restaurants/" + restId + "/reviews/" + review.getId();
-                String fullRelativePath = subPath + "/" + fileName;
+                Path structuredPath = Path.of(RESTAURANTS_BASE_DIR, String.valueOf(restId), "reviews", String.valueOf(review.getId()));
+                String subPath = structuredPath.toString();
+                String fullRelativePath = structuredPath.resolve(fileName).toString();
 
                 storeFile(subPath, fileName, file);
 
@@ -112,8 +116,9 @@ public class FileSystemStorageService {
                     throw new IllegalArgumentException("One or more files are not valid, check the format and size!");
                 }
                 String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-                String subPath = "restaurants/" + restaurant.getId() + "/gallery";
-                String fullRelativePath = subPath + "/" + fileName;
+                Path structuredPath = Path.of(RESTAURANTS_BASE_DIR, String.valueOf(restaurant.getId()), "gallery");
+                String subPath = structuredPath.toString();
+                String fullRelativePath = structuredPath.resolve(fileName).toString();
 
                 storeFile(subPath, fileName, file);
 
@@ -136,8 +141,10 @@ public class FileSystemStorageService {
      * @param reviewId unique identifier of the review that is also for tracking the target directory.
      */
     public void deleteReviewFolder(Long restaurantId, Long reviewId) {
-        Path directoryToDelete = rootLocation.resolve("restaurants/" + restaurantId + "/reviews/" + reviewId);
-        recursiveDelete(directoryToDelete);
+        Path directoryToDelete = Path.of(RESTAURANTS_BASE_DIR, String.valueOf(restaurantId), "reviews", String.valueOf(reviewId));
+        Path absoluteTargetDir = rootLocation.resolve(directoryToDelete);
+
+        recursiveDelete(absoluteTargetDir);
 
     }
 
@@ -147,8 +154,10 @@ public class FileSystemStorageService {
      * @param id unique identifier of the restaurant that is used to track the target directory.
      */
     public void deleteRestaurantFolder(Long id) {
-        Path directoryToDelete = rootLocation.resolve("restaurants/" + id);
-        recursiveDelete(directoryToDelete);
+        Path directoryToDelete = Path.of(RESTAURANTS_BASE_DIR, String.valueOf(id));
+        Path absoluteTargetDir = rootLocation.resolve(directoryToDelete);
+
+        recursiveDelete(absoluteTargetDir);
     }
 
     //HELPER FUNKCIJE
@@ -217,7 +226,7 @@ public class FileSystemStorageService {
             Path fileToDelete = rootLocation.resolve(path);
             Files.deleteIfExists(fileToDelete);
         } catch (IOException e) {
-            System.err.println("Failed to delete orphaned file: " + path);
+            log.error("Failed to delete orphaned file: {}", path, e);
         }
     }
 
@@ -232,11 +241,11 @@ public class FileSystemStorageService {
                         try {
                             Files.deleteIfExists(path);
                         } catch (IOException e) {
-                            System.err.println("Failed to delete: " + path);
+                            log.error("Failed to delete item during recursive delete: {}", path, e);
                         }
                     });
         } catch (IOException e) {
-            System.err.println("Failed to delete folder!");
+            log.error("Failed to traverse directory structure for recursive deletion: {}", directoryToDelete, e);
         }
     }
 

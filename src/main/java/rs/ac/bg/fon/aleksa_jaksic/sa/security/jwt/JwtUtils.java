@@ -22,6 +22,8 @@ public class JwtUtils {
     @Value("${security.token.secret}")
     private String secret;
 
+    private static final String ROLES_CLAIM = "roles";
+
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
@@ -34,7 +36,7 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
-                .claim("roles", roles)
+                .claim(ROLES_CLAIM, roles)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(getSigningKey())
@@ -57,7 +59,7 @@ public class JwtUtils {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        List<String> roles = claims.get("roles", List.class);
+        List<String> roles = claims.get(ROLES_CLAIM, List.class);
         return roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();
@@ -79,7 +81,7 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .subject(username)
-                .claim("roles", roles)
+                .claim(ROLES_CLAIM, roles)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(getSigningKey())

@@ -144,14 +144,16 @@ class WorkDayServiceTest {
     @DisplayName("Should throw EntityNotFoundException when restaurant is not found on create")
     void create_RestaurantNotFound_ThrowsException() {
         when(restaurantRepository.findById(restaurantId)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> workDayService.create(restaurantId, new WorkDayCreateUpdateDTO(LocalTime.of(9, 0), LocalTime.of(17, 0), DayOfWeek.MONDAY)));
+        WorkDayCreateUpdateDTO dto = new WorkDayCreateUpdateDTO(LocalTime.of(9, 0), LocalTime.of(17, 0), DayOfWeek.MONDAY);
+        assertThrows(EntityNotFoundException.class, () -> workDayService.create(restaurantId, dto));
     }
 
     @Test
     @DisplayName("Should throw EntityNotFoundException when workday is not found on update")
     void update_WorkDayNotFound_ThrowsException() {
         when(workDayRepository.findById(workDayId)).thenReturn(Optional.empty());
-        assertThrows(EntityNotFoundException.class, () -> workDayService.update(workDayId, new WorkDayCreateUpdateDTO(LocalTime.of(9, 0), LocalTime.of(17, 0), DayOfWeek.MONDAY)));
+        WorkDayCreateUpdateDTO dto = new WorkDayCreateUpdateDTO(LocalTime.of(9, 0), LocalTime.of(17, 0), DayOfWeek.MONDAY);
+        assertThrows(EntityNotFoundException.class, () -> workDayService.update(workDayId, dto));
     }
 
     @Test

@@ -25,7 +25,7 @@ public class ReviewController {
 
 
     @GetMapping("/api/restaurants/{id}/my-reviews")
-    public ResponseEntity<?> getCurrentUserReviews(
+    public ResponseEntity<Object> getCurrentUserReviews(
             @PathVariable Long id,
             Authentication authentication) {
         try {
@@ -42,7 +42,7 @@ public class ReviewController {
 
 
     @GetMapping("/api/restaurants/{id}/reviews")
-    public ResponseEntity<?> getOtherReviews(
+    public ResponseEntity<Object> getOtherReviews(
             @PathVariable Long id,
             Authentication authentication,
             Pageable pageable
@@ -60,7 +60,7 @@ public class ReviewController {
     }
 
     @PostMapping("/api/restaurants/{id}/reviews/create")
-    public ResponseEntity<?> create(
+    public ResponseEntity<Object> create(
             @PathVariable Long id,
             Authentication authentication,
             @RequestBody ReviewCreateUpdateDTO reviewCreateUpdateDTO
@@ -78,7 +78,7 @@ public class ReviewController {
     }
 
     @GetMapping("/api/reviews/{id}")
-    public ResponseEntity<?> getReview(@PathVariable Long id) {
+    public ResponseEntity<Object> getReview(@PathVariable Long id) {
         try {
             ReviewDetailsDTO review = reviewService.getReview(id);
             return ResponseEntity
@@ -93,7 +93,7 @@ public class ReviewController {
 
     @PreAuthorize("@reviewSecurity.isReviewOwner(#id, authentication)")
     @PatchMapping("/api/reviews/{id}")
-    public ResponseEntity<?> update(
+    public ResponseEntity<Object> update(
             @PathVariable Long id,
             @RequestBody ReviewCreateUpdateDTO reviewCreateUpdateDTO
     ) {
@@ -111,7 +111,7 @@ public class ReviewController {
 
     @PreAuthorize("hasAnyRole('ADMIN') or @reviewSecurity.isReviewOwner(#id, authentication)")
     @DeleteMapping("/api/reviews/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<Object> delete(@PathVariable Long id) {
         try {
             reviewService.delete(id);
             return ResponseEntity

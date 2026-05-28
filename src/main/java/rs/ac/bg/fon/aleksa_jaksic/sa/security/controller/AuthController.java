@@ -23,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLoginDTO userLoginDTO) {
+    public ResponseEntity<Object> login(@RequestBody UserLoginDTO userLoginDTO) {
 
         try {
             UserDetails userDetails = authService.authenticate(userLoginDTO.username(), userLoginDTO.password());
@@ -43,14 +43,14 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
+    public ResponseEntity<Object> logout() {
         return ResponseEntity.ok()
                 .headers(authService.createLogoutHeaders())
                 .body("Logged out");
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(HttpServletRequest request) {
+    public ResponseEntity<Object> refresh(HttpServletRequest request) {
         try {
 
             // 1. Validate and generate new headers

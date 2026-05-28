@@ -27,6 +27,9 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
+    private static final String ACCESS_TOKEN_COOKIE = "access_token";
+    private static final String REFRESH_TOKEN_COOKIE = "refresh_token";
+
     @Value("${security.token.access-expiration}")
     private Long accessExpiration;
 
@@ -59,7 +62,7 @@ public class AuthService {
         String accessToken = jwtUtils.createToken(userDetails, accessExpiration);
         String refreshToken = jwtUtils.createToken(userDetails, refreshExpiration);
 
-        ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
+        ResponseCookie accessCookie = ResponseCookie.from(ACCESS_TOKEN_COOKIE, accessToken)
                 .httpOnly(true)
                 .secure(false) // Set to true in production (HTTPS)
                 .path("/")
@@ -67,7 +70,7 @@ public class AuthService {
                 .sameSite("Lax")
                 .build();
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+        ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN_COOKIE, refreshToken)
                 .httpOnly(true)
                 .secure(false)
                 .path("/api/users/auth/refresh") // Only sent to refresh endpoint
@@ -88,7 +91,7 @@ public class AuthService {
      * @throws org.springframework.security.authentication.BadCredentialsException If the refresh cookie is expired or invalid.
      */
     public HttpHeaders refreshAccessToken(HttpServletRequest request) {
-        String refreshToken = jwtUtils.extractTokenFromCookie(request, "refresh_token");
+        String refreshToken = jwtUtils.extractTokenFromCookie(request, REFRESH_TOKEN_COOKIE);
 
         if (refreshToken == null || !jwtUtils.isTokenValid(refreshToken)) {
             throw new BadCredentialsException("Refresh token expired or invalid. Please login again.");
@@ -99,7 +102,7 @@ public class AuthService {
 
         String newAccessToken = jwtUtils.createTokenFromRefresh(username, authorities, accessExpiration);
 
-        ResponseCookie accessCookie = ResponseCookie.from("access_token", newAccessToken)
+        ResponseCookie accessCookie = ResponseCookie.from(ACCESS_TOKEN_COOKIE, newAccessToken)
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
@@ -117,9 +120,9 @@ public class AuthService {
      * @return HttpHeaders structure with empty cookies.
      */
     public HttpHeaders createLogoutHeaders() {
-        ResponseCookie accessCookie = ResponseCookie.from("access_token", "")
+        ResponseCookie accessCookie = ResponseCookie.from(ACCESS_TOKEN_COOKIE, "")
                 .maxAge(0).path("/").build();
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
+        ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN_COOKIE, "")
                 .maxAge(0).path("/api/users/auth/refresh").build();
 
         HttpHeaders headers = new HttpHeaders();
