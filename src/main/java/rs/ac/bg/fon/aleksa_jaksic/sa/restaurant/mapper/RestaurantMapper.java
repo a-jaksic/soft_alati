@@ -23,6 +23,8 @@ public interface RestaurantMapper {
     @Mapping(source = "restaurantType.name", target = "typeName")
     RestaurantDTO toDTO(Restaurant restaurant);
 
+    @Mapping(source = "city.id", target = "cityId")
+    @Mapping(source = "restaurantType.id", target = "restaurantTypeId")
     RestaurantDetailsDTO toDetailsDTO(Restaurant restaurant);
 
     void updateEntityFromUpdateDto(RestaurantCreateUpdateDTO restaurantCreateUpdateDTO, @MappingTarget Restaurant restaurant);
